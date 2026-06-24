@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Official Shop Administration - Painel Admin</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+</head>
+<body>
+  <div class="app-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="logo-icon">OS</div>
+        <div>
+          <div class="logo-text">Official Shop</div>
+          <div class="logo-sub">Administra\u00e7\u00e3o</div>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="nav-section">Principal</div>
+        <button class="nav-item active" data-section="dashboard-section" onclick="showSection('dashboard-section')">
+          <span class="nav-icon">\u1F4CA</span> Dashboard
+        </button>
+        <button class="nav-item" data-section="products-section" onclick="showSection('products-section')">
+          <span class="nav-icon">\u1F4E6</span> Produtos
+        </button>
+        <button class="nav-item" data-section="stock-section" onclick="showSection('stock-section')">
+          <span class="nav-icon">\u1F3EA</span> Stock
+        </button>
+        <button class="nav-item" data-section="sales-section" onclick="showSection('sales-section')">
+          <span class="nav-icon">\u1F4B0</span> Vendas
+        </button>
+        <button class="nav-item" data-section="movements-section" onclick="showSection('movements-section')">
+          <span class="nav-icon">\u1F504</span> Movimentos
+        </button>
+
+        <div class="nav-section">Opera\u00e7\u00f5es</div>
+        <button class="nav-item" data-section="cash-section" onclick="showSection('cash-section')">
+          <span class="nav-icon">\u1F4B3</span> Caixa
+        </button>
+        <button class="nav-item" data-section="fuel-section" onclick="showSection('fuel-section')">
+          <span class="nav-icon">\u26FD</span> Combust\u00edvel
+        </button>
+        <button class="nav-item" data-section="inventory-section" onclick="showSection('inventory-section')">
+          <span class="nav-icon">\u1F4CB</span> Invent\u00e1rio
+        </button>
+        <button class="nav-item" data-section="audit-section" onclick="showSection('audit-section')">
+          <span class="nav-icon">\u1F441</span> Auditoria
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="user-card" id="user-card"></div>
+        <button class="btn btn-danger btn-sm w-full mt-4" onclick="signOut()" style="margin-top:10px;">
+          \u2190 Sair
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Topbar -->
+      <header class="topbar">
+        <div class="topbar-left">
+          <h2 class="page-title" id="page-title">Dashboard</h2>
+        </div>
+        <div class="topbar-right" id="topbar-actions">
+          <!-- Dynamic actions -->
+        </div>
+      </header>
+
+      <!-- Content -->
+      <div class="content-area">
+
+        <!-- DASHBOARD SECTION -->
+        <div id="dashboard-section" class="section active">
+          <div class="stats-grid" id="stats-container"></div>
+
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">Resumo Financeiro</div>
+            </div>
+            <div class="card-body">
+              <div id="dashboard-report" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:20px;">
+                <div style="text-align:center;padding:20px;background:var(--bg-tertiary);border-radius:8px;">
+                  <div style="font-size:12px;color:var(--text-muted);margin-bottom:8px;">VENDAS HOJE</div>
+                  <div style="font-size:24px;font-weight:700;color:var(--success);" id="report-today-sales">-</div>
+                  <div style="font-size:12px;color:var(--text-secondary);margin-top:4px;" id="report-today-profit">Lucro: -</div>
+                </div>
+                <div style="text-align:center;padding:20px;background:var(--bg-tertiary);border-radius:8px;">
+                  <div style="font-size:12px;color:var(--text-muted);margin-bottom:8px;">VENDAS M\u00caS</div>
+                  <div style="font-size:24px;font-weight:700;color:var(--accent-secondary);" id="report-month-sales">-</div>
+                  <div style="font-size:12px;color:var(--text-secondary);margin-top:4px;" id="report-month-profit">Lucro: -</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">Produtos Mais Vendidos</div>
+            </div>
+            <div class="card-body" id="top-products-container">
+              <div class="empty-state"><div class="empty-icon">\u1F4C8</div><h3>Sem dados</h3></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PRODUCTS SECTION -->
+        <div id="products-section" class="section">
+          <div class="filters-bar">
+            <div class="search-box">
+              <input type="text" id="product-search" placeholder="Procurar produtos...">
+            </div>
+            <button class="btn btn-primary" onclick="newProduct()">+ Novo Produto</button>
+            <button class="btn btn-secondary" onclick="newCategory()">+ Categoria</button>
+          </div>
+
+          <div class="card">
+            <div class="card-header"><div class="card-title">Lista de Produtos</div></div>
+            <div class="card-body" id="products-table-container"></div>
+            <div class="card-footer" id="products-pagination"></div>
+          </div>
+
+          <div class="card" style="margin-top:24px;">
+            <div class="card-header"><div class="card-title">Categorias</div></div>
+            <div class="card-body" id="categories-table-container"></div>
+          </div>
+        </div>
+
+        <!-- STOCK SECTION -->
+        <div id="stock-section" class="section">
+          <div class="filters-bar">
+            <div class="search-box">
+              <input type="text" id="stock-search" placeholder="Procurar stock...">
+            </div>
+            <select class="form-select" id="stock-filter-location" style="width:160px;" onchange="renderStockTable()">
+              <option value="all">Todos Locais</option>
+              <option value="warehouse">Armaz\u00e9m</option>
+              <option value="store">Loja</option>
+            </select>
+            <button class="btn btn-primary" onclick="loadStock()">\u21BB Actualizar</button>
+          </div>
+
+          <div class="card">
+            <div class="card-header"><div class="card-title">Gest\u00e3o de Stock</div></div>
+            <div class="card-body" id="stock-table-container"></div>
+          </div>
+        </div>
+
+        <!-- SALES SECTION -->
+        <div id="sales-section" class="section">
+          <div class="filters-bar">
+            <input type="date" class="form-input" id="sales-date-from" style="width:160px;">
+            <input type="date" class="form-input" id="sales-date-to" style="width:160px;">
+            <button class="btn btn-primary" onclick="applySalesFilter()">Filtrar</button>
+            <button class="btn btn-secondary" onclick="loadSales(1)">\u21BB Actualizar</button>
+          </div>
+
+          <div class="card">
+            <div class="card-header"><div class="card-title">Hist\u00f3rico de Vendas</div></div>
+            <div class="card-body" id="sales-table-container"></div>
+            <div class="card-footer" id="sales-pagination"></div>
+          </div>
+        </div>
+
+        <!-- MOVEMENTS SECTION -->
+        <div id="movements-section" class="section">
+          <div class="filters-bar">
+            <select class="form-select" id="movement-filter-type" style="width:160px;" onchange="applyMovementFilter()">
+              <option value="">Todos Tipos</option>
+              <option value="in">Entrada</option>
+              <option value="out">Sa\u00edda</option>
+              <option value="sale">Venda</option>
+              <option value="transfer">Transfer\u00eancia</option>
+              <option value="adjustment">Ajuste</option>
+              <option value="loss">Perda</option>
+              <option value="theft">Roubo</option>
+            </select>
+            <input type="date" class="form-input" id="movement-date-from" style="width:160px;">
+            <input type="date" class="form-input" id="movement-date-to" style="width:160px;">
+            <button class="btn btn-primary" onclick="applyMovementFilter()">Filtrar</button>
+            <button class="btn btn-secondary" onclick="loadMovements(1)">\u21BB Actualizar</button>
+          </div>
+
+          <div class="card">
+            <div class="card-header"><div class="card-title">Movimentos (Fonte de Verdade)</div></div>
+            <div class="card-body" id="movements-table-container"></div>
+            <div class="card-footer" id="movements-pagination"></div>
+          </div>
+        </div>
+
+        <!-- CASH SECTION -->
+        <div id="cash-section" class="section">
+          <div class="filters-bar">
+            <button class="btn btn-success" onclick="openCashRegisterOpen()">Abrir Caixa</button>
+            <button class="btn btn-danger" onclick="openCashRegisterClose()">Fechar Caixa</button>
+            <button class="btn btn-secondary" onclick="loadCashRegister()">\u21BB Actualizar</button>
+          </div>
+
+          <div class="card">
+            <div class="card-header"><div class="card-title">Estado do Caixa</div></div>
+            <div class="card-body" id="cash-status-container">
+              <div class="empty-state"><div class="empty-icon">\u1F4B3</div><h3>A carregar...</h3></div>
+            </div>
+          </div>
+
+          <div class="card" style="margin-top:24px;">
+            <div class="card-header"><div class="card-title">Hist\u00f3rico de Caixas</div></div>
+            <div class="card-body" id="cash-history-container"></div>
+          </div>
+        </div>
+
+        <!-- FUEL SECTION -->
+        <div id="fuel-section" class="section">
+          <div class="filters-bar">
+            <button class="btn btn-primary" onclick="openModal('fuel-type-modal')">+ Novo Combust\u00edvel</button>
+            <button class="btn btn-secondary" onclick="loadFuel()">\u21BB Actualizar</button>
+          </div>
+
+          <div class="card">
+            <div class="card-header"><div class="card-title">N\u00edveis de Combust\u00edvel</div></div>
+            <div class="card-body" id="fuel-gauges-container"></div>
+          </div>
+
+          <div class="card" style="margin-top:24px;">
+            <div class="card-header"><div class="card-title">Gest\u00e3o de Combust\u00edvel</div></div>
+            <div class="card-body" id="fuel-table-container"></div>
+          </div>
+        </div>
+
+        <!-- INVENTORY SECTION -->
+        <div id="inventory-section" class="section">
+          <div class="filters-bar">
+            <button class="btn btn-primary" onclick="startNewInventory()">+ Novo Invent\u00e1rio</button>
+            <button class="btn btn-secondary" onclick="loadInventory()">\u21BB Actualizar</button>
+          </div>
+
+          <div class="card">
+            <div class="card-header"><div class="card-title">Sess\u00f5es de Invent\u00e1rio</div></div>
+            <div class="card-body" id="inventory-table-container"></div>
+          </div>
+        </div>
+
+        <!-- AUDIT SECTION -->
+        <div id="audit-section" class="section">
+          <div class="filters-bar">
+            <button class="btn btn-secondary" onclick="loadAuditLogs()">\u21BB Actualizar</button>
+          </div>
+
+          <div class="card">
+            <div class="card-header"><div class="card-title">Logs de Auditoria</div></div>
+            <div class="card-body" id="audit-table-container"></div>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- MODALS -->
+
+  <!-- Product Modal -->
+  <div class="modal-overlay" id="product-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title" id="product-modal-title">Novo Produto</div>
+        <button class="modal-close" onclick="closeModal('product-modal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="product-form">
+          <input type="hidden" id="product-id">
+          <div class="form-group">
+            <label class="form-label">Nome do Produto *</label>
+            <input type="text" class="form-input" id="product-name" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Categoria</label>
+            <select class="form-select category-select" id="product-category">
+              <option value="">Selecionar...</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Tipo de Unidade</label>
+              <select class="form-select" id="product-unit">
+                <option value="unit">Unidade</option>
+                <option value="box">Caixa</option>
+                <option value="liter">Litro</option>
+                <option value="kg">Quilograma</option>
+                <option value="meter">Metro</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Stock M\u00ednimo</label>
+              <input type="number" class="form-input" id="product-min-stock" value="5" min="0">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Pre\u00e7o de Compra *</label>
+              <input type="number" class="form-input" id="product-purchase" step="0.01" min="0" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Pre\u00e7o de Venda *</label>
+              <input type="number" class="form-input" id="product-sale" step="0.01" min="0" required>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('product-modal')">Cancelar</button>
+        <button class="btn btn-primary" onclick="saveProduct()">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Category Modal -->
+  <div class="modal-overlay" id="category-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title">Nova Categoria</div>
+        <button class="modal-close" onclick="closeModal('category-modal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="category-form">
+          <input type="hidden" id="category-id">
+          <div class="form-group">
+            <label class="form-label">Nome da Categoria *</label>
+            <input type="text" class="form-input" id="category-name" required>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('category-modal')">Cancelar</button>
+        <button class="btn btn-primary" onclick="saveCategory()">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stock In Modal -->
+  <div class="modal-overlay" id="stockin-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title">Entrada de Stock</div>
+        <button class="modal-close" onclick="closeModal('stockin-modal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="stockin-product-id">
+        <p style="margin-bottom:16px;color:var(--text-secondary);">Produto: <strong id="stockin-product-name" style="color:var(--text-primary);"></strong></p>
+        <p style="margin-bottom:16px;font-size:12px;color:var(--text-muted);">Stock actual: <span id="stockin-current"></span></p>
+        <div class="form-group">
+          <label class="form-label">Quantidade *</label>
+          <input type="number" class="form-input" id="stockin-qty" step="1" min="1" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Local</label>
+          <select class="form-select" id="stockin-location">
+            <option value="warehouse">Armaz\u00e9m</option>
+            <option value="store">Loja</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('stockin-modal')">Cancelar</button>
+        <button class="btn btn-success" onclick="confirmStockIn()">Registar Entrada</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stock Out Modal -->
+  <div class="modal-overlay" id="stockout-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title">Sa\u00edda de Stock</div>
+        <button class="modal-close" onclick="closeModal('stockout-modal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="stockout-product-id">
+        <p style="margin-bottom:16px;color:var(--text-secondary);">Produto: <strong id="stockout-product-name" style="color:var(--text-primary);"></strong></p>
+        <p style="margin-bottom:16px;font-size:12px;color:var(--text-muted);">Stock actual: <span id="stockout-current"></span></p>
+        <div class="form-group">
+          <label class="form-label">Quantidade *</label>
+          <input type="number" class="form-input" id="stockout-qty" step="1" min="1" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Local</label>
+          <select class="form-select" id="stockout-location">
+            <option value="warehouse">Armaz\u00e9m</option>
+            <option value="store">Loja</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('stockout-modal')">Cancelar</button>
+        <button class="btn btn-danger" onclick="confirmStockOut()">Registar Sa\u00edda</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Transfer Modal -->
+  <div class="modal-overlay" id="transfer-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title">Transfer\u00eancia de Stock</div>
+        <button class="modal-close" onclick="closeModal('transfer-modal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="transfer-product-id">
+        <p style="margin-bottom:16px;color:var(--text-secondary);">Produto: <strong id="transfer-product-name" style="color:var(--text-primary);"></strong></p>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;font-size:12px;">
+          <div>Armaz\u00e9m: <strong id="transfer-current-wh"></strong></div>
+          <div>Loja: <strong id="transfer-current-store"></strong></div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">De</label>
+          <select class="form-select" id="transfer-from">
+            <option value="warehouse">Armaz\u00e9m</option>
+            <option value="store">Loja</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Quantidade *</label>
+          <input type="number" class="form-input" id="transfer-qty" step="1" min="1" required>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('transfer-modal')">Cancelar</button>
+        <button class="btn btn-primary" onclick="confirmTransfer()">Transferir</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cash Open Modal -->
+  <div class="modal-overlay" id="cash-open-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title">Abrir Caixa</div>
+        <button class="modal-close" onclick="closeModal('cash-open-modal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Valor de Abertura (MZN) *</label>
+          <input type="number" class="form-input" id="cash-open-amount" step="0.01" min="0" required placeholder="0.00">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('cash-open-modal')">Cancelar</button>
+        <button class="btn btn-success" onclick="confirmCashOpen()">Abrir Caixa</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cash Close Modal -->
+  <div class="modal-overlay" id="cash-close-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title">Fechar Caixa</div>
+        <button class="modal-close" onclick="closeModal('cash-close-modal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p style="margin-bottom:16px;">Valor esperado: <strong id="cash-close-expected" style="color:var(--accent-secondary);"></strong></p>
+        <div class="form-group">
+          <label class="form-label">Valor de Fecho (MZN) *</label>
+          <input type="number" class="form-input" id="cash-close-amount" step="0.01" min="0" required placeholder="0.00">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('cash-close-modal')">Cancelar</button>
+        <button class="btn btn-danger" onclick="confirmCashClose()">Fechar Caixa</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Fuel Entry Modal -->
+  <div class="modal-overlay" id="fuel-entry-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title">Entrada de Combust\u00edvel</div>
+        <button class="modal-close" onclick="closeModal('fuel-entry-modal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="fuel-entry-id">
+        <p style="margin-bottom:16px;">Tipo: <strong id="fuel-entry-type"></strong></p>
+        <div class="form-group">
+          <label class="form-label">Quantidade (Litros) *</label>
+          <input type="number" class="form-input" id="fuel-entry-qty" step="1" min="1" required>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Pre\u00e7o Compra/L *</label>
+            <input type="number" class="form-input" id="fuel-entry-purchase" step="0.01" min="0" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Pre\u00e7o Venda/L *</label>
+            <input type="number" class="form-input" id="fuel-entry-sale" step="0.01" min="0" required>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('fuel-entry-modal')">Cancelar</button>
+        <button class="btn btn-success" onclick="confirmFuelEntry()">Registar Entrada</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Fuel Sale Modal -->
+  <div class="modal-overlay" id="fuel-sale-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title">Venda de Combust\u00edvel</div>
+        <button class="modal-close" onclick="closeModal('fuel-sale-modal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="fuel-sale-id">
+        <p style="margin-bottom:8px;">Tipo: <strong id="fuel-sale-type"></strong></p>
+        <p style="margin-bottom:8px;font-size:12px;color:var(--text-muted);">Dispon\u00edvel: <span id="fuel-sale-available"></span></p>
+        <p style="margin-bottom:16px;font-size:12px;color:var(--text-muted);">Pre\u00e7o: <span id="fuel-sale-price"></span></p>
+        <div class="form-group">
+          <label class="form-label">Quantidade (Litros) *</label>
+          <input type="number" class="form-input" id="fuel-sale-qty" step="1" min="1" required>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('fuel-sale-modal')">Cancelar</button>
+        <button class="btn btn-primary" onclick="confirmFuelSale()">Registar Venda</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Fuel Type Modal -->
+  <div class="modal-overlay" id="fuel-type-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title">Novo Tipo de Combust\u00edvel</div>
+        <button class="modal-close" onclick="closeModal('fuel-type-modal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Tipo *</label>
+          <input type="text" class="form-input" id="new-fuel-type" required placeholder="Ex: Gasolina, Diesel">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Pre\u00e7o Compra/L *</label>
+            <input type="number" class="form-input" id="new-fuel-purchase" step="0.01" min="0" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Pre\u00e7o Venda/L *</label>
+            <input type="number" class="form-input" id="new-fuel-sale" step="0.01" min="0" required>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('fuel-type-modal')">Cancelar</button>
+        <button class="btn btn-primary" onclick="saveFuelType()">Criar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Inventory Counter Modal -->
+  <div class="modal-overlay" id="inventory-counter-modal">
+    <div class="modal modal-lg">
+      <div class="modal-header">
+        <div class="modal-title">Contagem de Invent\u00e1rio</div>
+        <button class="modal-close" onclick="closeModal('inventory-counter-modal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="inventory-session-id">
+        <div id="inventory-counter-body"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('inventory-counter-modal')">Cancelar</button>
+        <button class="btn btn-primary" onclick="submitInventoryCounts()">Submeter Contagens</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Inventory View Modal -->
+  <div class="modal-overlay" id="inventory-view-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title">Detalhes do Invent\u00e1rio</div>
+        <button class="modal-close" onclick="closeModal('inventory-view-modal')">&times;</button>
+      </div>
+      <div class="modal-body" id="inventory-view-body"></div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('inventory-view-modal')">Fechar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/supabase.js"></script>
+  <script src="js/core.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/products.js"></script>
+  <script src="js/stock.js"></script>
+  <script src="js/sales.js"></script>
+  <script src="js/movements.js"></script>
+  <script src="js/inventory.js"></script>
+  <script src="js/fuel.js"></script>
+
+  <script>
+    // Auth guard
+    document.addEventListener('DOMContentLoaded', async () => {
+      initSupabase();
+
+      const user = requireAdmin();
+      if (!user) return;
+
+      renderUserCard();
+      setupProductSearch();
+
+      // Load initial data
+      await loadDashboard();
+      await loadCategories();
+      await loadProducts();
+      await loadStock();
+      await loadSales();
+      await loadMovements();
+      await loadCashRegister();
+      await loadFuel();
+      await loadInventory();
+      await loadAuditLogs();
+
+      // Restore last section
+      const lastSection = sessionStorage.getItem('currentSection');
+      if (lastSection) showSection(lastSection);
+
+      // Setup online/offline detection
+      window.addEventListener('online', () => {
+        showToast('success', 'Ligação restabelecida');
+        syncOfflineQueue();
+      });
+      window.addEventListener('offline', () => {
+        showToast('warning', 'Modo offline - dados serão sincronizados');
+      });
+    });
+
+    // Dashboard
+    async function loadDashboard() {
+      try {
+        const stats = await getDashboardStats();
+        renderStatsCards(stats);
+        await loadSalesReport();
+      } catch (e) {
+        showToast('error', 'Erro ao carregar dashboard');
+      }
+    }
+
+    // Cash Register
+    async function loadCashRegister() {
+      try {
+        const openReg = await getOpenRegister();
+        const statusContainer = document.getElementById('cash-status-container');
+
+        if (!openReg) {
+          statusContainer.innerHTML = `
+            <div class="empty-state">
+              <div class="empty-icon">\u1F4B3</div>
+              <h3>Caixa Fechado</h3>
+              <p>O caixa está fechado. Clique em "Abrir Caixa" para iniciar.</p>
+            </div>
+          `;
+        } else {
+          const expected = (openReg.opening_balance || 0) + (openReg.total_sales || 0) - (openReg.total_expenses || 0);
+          statusContainer.innerHTML = `
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:16px;">
+              <div style="padding:16px;background:var(--success-bg);border-radius:8px;text-align:center;">
+                <div style="font-size:11px;color:var(--success);text-transform:uppercase;">Status</div>
+                <div style="font-size:16px;font-weight:700;color:var(--success);margin-top:4px;">ABERTO</div>
+              </div>
+              <div style="padding:16px;background:var(--bg-tertiary);border-radius:8px;text-align:center;">
+                <div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;">Abertura</div>
+                <div style="font-size:16px;font-weight:700;margin-top:4px;">${formatMoney(openReg.opening_balance)}</div>
+              </div>
+              <div style="padding:16px;background:var(--bg-tertiary);border-radius:8px;text-align:center;">
+                <div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;">Vendas</div>
+                <div style="font-size:16px;font-weight:700;color:var(--success);margin-top:4px;">${formatMoney(openReg.total_sales || 0)}</div>
+              </div>
+              <div style="padding:16px;background:var(--bg-tertiary);border-radius:8px;text-align:center;">
+                <div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;">Esperado</div>
+                <div style="font-size:16px;font-weight:700;color:var(--accent-secondary);margin-top:4px;">${formatMoney(expected)}</div>
+              </div>
+            </div>
+          `;
+        }
+
+        // Load history
+        const { data: history } = await getSupabase()
+          .from('cash_register')
+          .select('*')
+          .order('created_at', { ascending: false })
+          .limit(10);
+
+        const historyContainer = document.getElementById('cash-history-container');
+        if (history && history.length > 0) {
+          renderTable('cash-history-container',
+            [
+              { label: 'Data', field: 'created_at', format: v => formatDate(v) },
+              { label: 'Abertura', field: 'opening_balance', format: v => formatMoney(v) },
+              { label: 'Vendas', field: 'total_sales', format: v => formatMoney(v || 0) },
+              { label: 'Fecho', field: 'closing_balance', format: v => v ? formatMoney(v) : '-' },
+              { label: 'Diferen\u00e7a', field: 'difference', format: v => v !== null ? formatMoney(v) : '-' },
+              { label: 'Estado', field: 'status', badge: { 'open': 'badge-success', 'closed': 'badge-danger' }, badgeMap: { 'open': 'Aberto', 'closed': 'Fechado' } }
+            ],
+            history,
+            null
+          );
+        } else {
+          historyContainer.innerHTML = '<div class="empty-state"><h3>Sem hist\u00f3rico</h3></div>';
+        }
+      } catch (e) {
+        showToast('error', 'Erro ao carregar caixa: ' + e.message);
+      }
+    }
+
+    async function openCashRegisterOpen() {
+      const existing = await getOpenRegister();
+      if (existing) {
+        showToast('warning', 'Caixa j\u00e1 est\u00e1 aberto');
+        return;
+      }
+      document.getElementById('cash-open-amount').value = '';
+      openModal('cash-open-modal');
+    }
+
+    async function confirmCashOpen() {
+      try {
+        const amount = parseFloat(document.getElementById('cash-open-amount').value);
+        const user = getStoredUser();
+        validatePositiveNumber(amount, 'Valor de abertura');
+        await openCashRegister(amount, user.id);
+        showToast('success', 'Caixa aberto com sucesso');
+        closeModal('cash-open-modal');
+        loadCashRegister();
+      } catch (e) {
+        showToast('error', e.message);
+      }
+    }
+
+    async function openCashRegisterClose() {
+      const reg = await getOpenRegister();
+      if (!reg) {
+        showToast('error', 'Caixa n\u00e3o est\u00e1 aberto');
+        return;
+      }
+      const expected = (reg.opening_balance || 0) + (reg.total_sales || 0) - (reg.total_expenses || 0);
+      document.getElementById('cash-close-expected').textContent = formatMoney(expected);
+      document.getElementById('cash-close-amount').value = '';
+      openModal('cash-close-modal');
+    }
+
+    async function confirmCashClose() {
+      try {
+        const amount = parseFloat(document.getElementById('cash-close-amount').value);
+        const user = getStoredUser();
+        const reg = await getOpenRegister();
+        validatePositiveNumber(amount, 'Valor de fecho');
+        await closeCashRegister(reg.id, amount, user.id);
+        showToast('success', 'Caixa fechado com sucesso');
+        closeModal('cash-close-modal');
+        loadCashRegister();
+      } catch (e) {
+        showToast('error', e.message);
+      }
+    }
+
+    // Audit Logs
+    async function loadAuditLogs() {
+      try {
+        const { data } = await getSupabase()
+          .from('audit_logs')
+          .select('*')
+          .order('created_at', { ascending: false })
+          .limit(50);
+
+        const container = document.getElementById('audit-table-container');
+        if (!data || !data.length) {
+          container.innerHTML = '<div class="empty-state"><h3>Sem registos de auditoria</h3></div>';
+          return;
+        }
+
+        renderTable('audit-table-container',
+          [
+            { label: 'Data', field: 'created_at', format: v => formatDate(v) },
+            { label: 'Ac\u00e7\u00e3o', field: 'action' },
+            { label: 'Tabela', field: 'table_name' },
+            { label: 'Utilizador', field: 'user_id', format: v => v ? v.slice(0,8)+'...' : 'Sistema' }
+          ],
+          data,
+          null
+        );
+      } catch (e) {
+        showToast('error', 'Erro ao carregar auditoria');
+      }
+    }
+  </script>
+</body>
+</html>

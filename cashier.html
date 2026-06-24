@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Official Shop - Ponto de Venda</title>
+  <link rel="stylesheet" href="css/paginacashier.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+</head>
+<body>
+  <div class="pos-layout">
+    <!-- Header -->
+    <header class="pos-header">
+      <div class="pos-brand">
+        <div class="pos-brand-icon">OS</div>
+        <div class="pos-brand-text">Official Shop <span style="font-size:12px;color:var(--pos-text-secondary);font-weight:400;">| Ponto de Venda</span></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <div id="cashier-status"></div>
+        <div id="register-info"></div>
+      </div>
+      <div class="pos-header-actions">
+        <button class="pos-cat-btn" onclick="openCashOpenModal()">\u1F4B3 Abrir</button>
+        <button class="pos-cat-btn" onclick="openCashCloseModal()">\u1F4B3 Fechar</button>
+        <div class="pos-user" id="pos-user-info"></div>
+        <button class="pos-cat-btn" onclick="signOut()" style="background:var(--pos-danger);color:white;">Sair</button>
+      </div>
+    </header>
+
+    <!-- Products Area -->
+    <div class="pos-products">
+      <div class="pos-toolbar">
+        <div class="pos-search">
+          <input type="text" id="pos-search" placeholder="Procurar produtos..." oninput="renderPOSProducts()">
+        </div>
+      </div>
+      <div class="pos-categories" id="pos-categories">
+        <button class="pos-cat-btn active" onclick="filterPOSCategory('all')">Tudo</button>
+      </div>
+      <div class="pos-product-grid" id="pos-product-grid">
+        <div class="pos-loading"><div class="pos-spinner"></div>A carregar produtos...</div>
+      </div>
+    </div>
+
+    <!-- Cart Panel -->
+    <div class="pos-cart">
+      <div class="pos-cart-header">
+        <div class="pos-cart-title">
+          <span>\u1F6D2 Carrinho</span>
+          <span class="pos-cart-count" id="cart-count">0</span>
+        </div>
+      </div>
+
+      <div class="pos-cart-items" id="pos-cart-items">
+        <div class="pos-cart-empty">
+          <div class="empty-icon">\u1F6D2</div>
+          <h3>Carrinho vazio</h3>
+          <p>Selecione produtos para iniciar</p>
+        </div>
+      </div>
+
+      <div class="pos-cart-footer">
+        <div class="pos-cart-summary">
+          <div class="pos-summary-row">
+            <span>Subtotal</span>
+            <span id="cart-subtotal">MT 0,00</span>
+          </div>
+          <div class="pos-summary-row total">
+            <span>TOTAL</span>
+            <span id="cart-total">MT 0,00</span>
+          </div>
+        </div>
+        <button class="pos-checkout-btn" id="checkout-btn" onclick="openCheckout()" disabled>
+          <span>\u2713</span> Finalizar Venda
+        </button>
+        <button class="pos-cat-btn w-full mt-4" onclick="clearCart()" style="margin-top:8px;background:var(--pos-elevated);">\u1F5D1 Limpar Carrinho</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Checkout Modal -->
+  <div class="pos-modal-overlay" id="checkout-modal">
+    <div class="pos-modal">
+      <div class="pos-modal-header">
+        <div class="pos-modal-title">Finalizar Venda</div>
+        <button class="pos-modal-close" onclick="closeCheckout()">&times;</button>
+      </div>
+      <div class="pos-modal-body">
+        <div style="text-align:center;margin-bottom:20px;">
+          <div style="font-size:12px;color:var(--pos-muted);margin-bottom:8px;">TOTAL A PAGAR</div>
+          <div style="font-size:32px;font-weight:700;color:var(--pos-accent-light);" id="checkout-total">MT 0,00</div>
+        </div>
+        <div id="checkout-summary" style="max-height:200px;overflow-y:auto;margin-bottom:16px;"></div>
+      </div>
+      <div class="pos-modal-footer">
+        <button class="pos-cat-btn" onclick="closeCheckout()" style="flex:1;background:var(--pos-elevated);">Cancelar</button>
+        <button class="pos-checkout-btn" onclick="confirmCheckout()" style="flex:2;">\u2713 Confirmar Venda</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cash Open Modal -->
+  <div class="pos-modal-overlay" id="cash-open-modal">
+    <div class="pos-modal">
+      <div class="pos-modal-header">
+        <div class="pos-modal-title">Abrir Caixa</div>
+        <button class="pos-modal-close" onclick="closeCashOpenModal()">&times;</button>
+      </div>
+      <div class="pos-modal-body">
+        <div class="form-group">
+          <label style="display:block;font-size:12px;color:var(--pos-text-secondary);margin-bottom:6px;">Valor de Abertura (MZN)</label>
+          <input type="number" class="form-input" id="cash-open-amount" style="width:100%;padding:12px;background:var(--pos-elevated);border:1px solid var(--pos-border);border-radius:8px;color:var(--pos-text);font-size:16px;" step="0.01" min="0" placeholder="0.00">
+        </div>
+      </div>
+      <div class="pos-modal-footer">
+        <button class="pos-cat-btn" onclick="closeCashOpenModal()" style="flex:1;background:var(--pos-elevated);">Cancelar</button>
+        <button class="pos-checkout-btn" onclick="confirmOpenCash()" style="flex:1;">Abrir</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cash Close Modal -->
+  <div class="pos-modal-overlay" id="cash-close-modal">
+    <div class="pos-modal">
+      <div class="pos-modal-header">
+        <div class="pos-modal-title">Fechar Caixa</div>
+        <button class="pos-modal-close" onclick="closeCashCloseModal()">&times;</button>
+      </div>
+      <div class="pos-modal-body">
+        <p style="margin-bottom:12px;color:var(--pos-text-secondary);">Valor esperado: <strong id="cash-close-expected" style="color:var(--pos-accent-light);"></strong></p>
+        <div class="form-group">
+          <label style="display:block;font-size:12px;color:var(--pos-text-secondary);margin-bottom:6px;">Valor de Fecho (MZN)</label>
+          <input type="number" class="form-input" id="cash-close-amount" style="width:100%;padding:12px;background:var(--pos-elevated);border:1px solid var(--pos-border);border-radius:8px;color:var(--pos-text);font-size:16px;" step="0.01" min="0" placeholder="0.00">
+        </div>
+      </div>
+      <div class="pos-modal-footer">
+        <button class="pos-cat-btn" onclick="closeCashCloseModal()" style="flex:1;background:var(--pos-elevated);">Cancelar</button>
+        <button class="pos-checkout-btn" onclick="confirmCloseCash()" style="flex:1;background:linear-gradient(135deg,var(--pos-danger),#dc2626);">Fechar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Receipt Modal -->
+  <div class="pos-modal-overlay" id="receipt-modal">
+    <div class="pos-modal">
+      <div class="pos-modal-header">
+        <div class="pos-modal-title">Venda Conclu\u00edda</div>
+        <button class="pos-modal-close" onclick="closeReceipt()">&times;</button>
+      </div>
+      <div class="pos-modal-body">
+        <div id="receipt-content"></div>
+      </div>
+      <div class="pos-modal-footer">
+        <button class="pos-cat-btn" onclick="closeReceipt()" style="flex:1;background:var(--pos-elevated);">Fechar</button>
+        <button class="pos-checkout-btn" onclick="printReceipt()" style="flex:1;">\u1F5B7 Imprimir</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/supabase.js"></script>
+  <script src="js/core.js"></script>
+  <script src="js/cashier.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      initSupabase();
+
+      const user = requireCashier();
+      if (!user) return;
+
+      await initPOS();
+
+      // Online/offline
+      window.addEventListener('online', () => {
+        showToast('success', 'Ligação restabelecida');
+        syncOfflineQueue();
+      });
+      window.addEventListener('offline', () => {
+        showToast('warning', 'Modo offline ativo');
+      });
+    });
+  </script>
+</body>
+</html>

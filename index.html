@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Official Shop Administration - Login</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+</head>
+<body>
+  <div class="login-page">
+    <div class="login-box">
+      <div class="login-logo">
+        <div class="logo-icon-lg">OS</div>
+        <h1>Official Shop Administration</h1>
+        <p>Sistema de Gestão ERP</p>
+      </div>
+
+      <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('login')">Entrar</button>
+        <button class="tab-btn" onclick="switchTab('register')">Registar</button>
+      </div>
+
+      <!-- Login Form -->
+      <div id="login-panel" class="tab-panel active">
+        <form id="login-form" onsubmit="handleLogin(event)">
+          <div class="form-group">
+            <label class="form-label">Email</label>
+            <input type="email" class="form-input" id="login-email" required placeholder="seu@email.com">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Senha</label>
+            <input type="password" class="form-input" id="login-password" required placeholder="\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022">
+          </div>
+          <button type="submit" class="btn btn-primary w-full" style="margin-top:8px;">
+            <span id="login-spinner" class="loading-spinner hidden" style="width:16px;height:16px;border-width:2px;display:inline-block;vertical-align:middle;margin-right:8px;"></span>
+            Entrar no Sistema
+          </button>
+        </form>
+      </div>
+
+      <!-- Register Form -->
+      <div id="register-panel" class="tab-panel">
+        <form id="register-form" onsubmit="handleRegister(event)">
+          <div class="form-group">
+            <label class="form-label">Nome Completo</label>
+            <input type="text" class="form-input" id="reg-name" required placeholder="Seu nome">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Email</label>
+            <input type="email" class="form-input" id="reg-email" required placeholder="seu@email.com">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Senha</label>
+            <input type="password" class="form-input" id="reg-password" required placeholder="M\u00ednimo 6 caracteres" minlength="6">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Perfil</label>
+            <select class="form-select" id="reg-role">
+              <option value="cashier">Operador de Caixa</option>
+              <option value="junior_admin">Administrador J\u00fanior</option>
+              <option value="admin">Administrador</option>
+            </select>
+          </div>
+          <button type="submit" class="btn btn-primary w-full" style="margin-top:8px;">
+            Criar Conta
+          </button>
+        </form>
+      </div>
+
+      <div style="text-align:center;margin-top:20px;font-size:12px;color:var(--text-muted);">
+        <p>\u00a9 2025 Official Shop Administration. ERP Profissional.</p>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/supabase.js"></script>
+  <script src="js/core.js"></script>
+  <script src="js/ui.js"></script>
+
+  <script>
+    // Initialize Supabase on load
+    document.addEventListener('DOMContentLoaded', () => {
+      initSupabase();
+      checkSession();
+    });
+
+    async function checkSession() {
+      const user = await getCurrentUser();
+      if (user) {
+        // Redirect based on role
+        if (user.role === 'admin' || user.role === 'junior_admin') {
+          window.location.href = 'admin.html';
+        } else {
+          window.location.href = 'cashier.html';
+        }
+      }
+    }
+
+    function switchTab(tab) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+
+      if (tab === 'login') {
+        document.querySelectorAll('.tab-btn')[0].classList.add('active');
+        document.getElementById('login-panel').classList.add('active');
+      } else {
+        document.querySelectorAll('.tab-btn')[1].classList.add('active');
+        document.getElementById('register-panel').classList.add('active');
+      }
+    }
+
+    async function handleLogin(e) {
+      e.preventDefault();
+      const spinner = document.getElementById('login-spinner');
+      spinner.classList.remove('hidden');
+
+      try {
+        const email = document.getElementById('login-email').value.trim();
+        const password = document.getElementById('login-password').value;
+
+        await signIn(email, password);
+        const user = await getCurrentUser();
+
+        showToast('success', `Bem-vindo, ${user.name || user.email}!`);
+
+        setTimeout(() => {
+          if (user.role === 'admin' || user.role === 'junior_admin') {
+            window.location.href = 'admin.html';
+          } else {
+            window.location.href = 'cashier.html';
+          }
+        }, 500);
+      } catch (err) {
+        showToast('error', err.message || 'Erro ao entrar');
+      } finally {
+        spinner.classList.add('hidden');
+      }
+    }
+
+    async function handleRegister(e) {
+      e.preventDefault();
+      try {
+        const name = document.getElementById('reg-name').value.trim();
+        const email = document.getElementById('reg-email').value.trim();
+        const password = document.getElementById('reg-password').value;
+        const role = document.getElementById('reg-role').value;
+
+        validateRequired(name, 'Nome');
+        validateRequired(email, 'Email');
+        validateRequired(password, 'Senha');
+
+        // Register with Supabase Auth
+        const { data: authData, error: authError } = await getSupabase().auth.signUp({
+          email, password,
+          options: { data: { name, role } }
+        });
+
+        if (authError) throw authError;
+
+        // Create user record in users table
+        if (authData.user) {
+          await insertRecord('users', {
+            id: authData.user.id,
+            name: name,
+            email: email,
+            role: role
+          });
+        }
+
+        showToast('success', 'Conta criada com sucesso! Verifique seu email.');
+        switchTab('login');
+      } catch (err) {
+        showToast('error', err.message || 'Erro ao registar');
+      }
+    }
+  </script>
+</body>
+</html>
