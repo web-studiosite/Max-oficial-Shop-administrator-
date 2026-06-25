@@ -12,8 +12,7 @@ let supabase = null;
 
 function initSupabase() {
   if (!supabase && typeof createClient !== 'undefined') {
-    supabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
-      auth: { persistSession: true, autoRefreshToken: true }
+    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
     });
   }
   return supabase;
