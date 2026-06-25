@@ -11,9 +11,17 @@ const SUPABASE_KEY = 'sb_publishable_juqKcXrT73-MdSf0qERjyQ_g1GHZoGQ';
 let supabase = null;
 
 function initSupabase() {
-  if (!supabase && typeof createClient !== 'undefined') {
-    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
-    });
+  if (!supabase) {
+    // Verifica se o SDK do Supabase está disponível no window
+    if (typeof window.supabase !== 'undefined' && typeof window.supabase.createClient === 'function') {
+      supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    } else if (typeof window.createClient === 'function') {
+      // Algumas versões CDN expõem createClient diretamente
+      supabase = window.createClient(SUPABASE_URL, SUPABASE_KEY);
+    } else {
+      console.error('Supabase SDK não encontrado. Verifica se o script do Supabase está carregado no HTML antes deste ficheiro.');
+      throw new Error('Supabase SDK não carregado');
+    }
   }
   return supabase;
 }
