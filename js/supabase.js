@@ -3,7 +3,7 @@
    Official Shop Administration ERP
    ============================================ */
 
-// ── Configuration ──────────────────────────
+// ── Configuration ─────────────────────────
 const SUPABASE_URL = 'https://xkckgzxtsiwoqqvopnkn.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_juqKcXrT73-MdSf0qERjyQ_g1GHZoGQ';
 
