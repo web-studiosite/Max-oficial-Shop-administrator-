@@ -4,8 +4,8 @@
    ============================================ */
 
 // ── Configuration ──────────────────────────
-const SUPABASE_URL = 'https://xkckgzxtsiwoqqvopnkn.supabase.co;
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhrY2tnenh0c2l3b3Fxdm9wbmtuIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3ODU3NzcwMywiZXhwIjoyMDk0MTUzNzAzfQ.QpGAHJGp_VwYuwotDn2LTMAIeItKKw8JMBG6CH0PtnA;
+const SUPABASE_URL = 'https://xkckgzxtsiwoqqvopnkn.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_juqKcXrT73-MdSf0qERjyQ_g1GHZoGQ';
 
 // ── Supabase Client ────────────────────────
 let supabase = null;
