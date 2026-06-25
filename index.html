@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Official Shop Administration - Login</title>
   <link rel="stylesheet" href="css/style.css">
+  <!-- 1. Supabase SDK via CDN -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 </head>
 <body>
@@ -30,7 +31,7 @@
           </div>
           <div class="form-group">
             <label class="form-label">Senha</label>
-            <input type="password" class="form-input" id="login-password" required placeholder="\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022">
+            <input type="password" class="form-input" id="login-password" required placeholder="••••••••">
           </div>
           <button type="submit" class="btn btn-primary w-full" style="margin-top:8px;">
             <span id="login-spinner" class="loading-spinner hidden" style="width:16px;height:16px;border-width:2px;display:inline-block;vertical-align:middle;margin-right:8px;"></span>
@@ -52,13 +53,13 @@
           </div>
           <div class="form-group">
             <label class="form-label">Senha</label>
-            <input type="password" class="form-input" id="reg-password" required placeholder="M\u00ednimo 6 caracteres" minlength="6">
+            <input type="password" class="form-input" id="reg-password" required placeholder="Mínimo 6 caracteres" minlength="6">
           </div>
           <div class="form-group">
             <label class="form-label">Perfil</label>
             <select class="form-select" id="reg-role">
               <option value="cashier">Operador de Caixa</option>
-              <option value="junior_admin">Administrador J\u00fanior</option>
+              <option value="junior_admin">Administrador Júnior</option>
               <option value="admin">Administrador</option>
             </select>
           </div>
@@ -69,11 +70,12 @@
       </div>
 
       <div style="text-align:center;margin-top:20px;font-size:12px;color:var(--text-muted);">
-        <p>\u00a9 2025 Official Shop Administration. ERP Profissional.</p>
+        <p>© 2025 Official Shop Administration. ERP Profissional.</p>
       </div>
     </div>
   </div>
 
+  <!-- 2. Os teus scripts (DEPOIS do Supabase CDN) -->
   <script src="js/supabase.js"></script>
   <script src="js/core.js"></script>
   <script src="js/ui.js"></script>
@@ -86,14 +88,18 @@
     });
 
     async function checkSession() {
-      const user = await getCurrentUser();
-      if (user) {
-        // Redirect based on role
-        if (user.role === 'admin' || user.role === 'junior_admin') {
-          window.location.href = 'admin.html';
-        } else {
-          window.location.href = 'cashier.html';
+      try {
+        const user = await getCurrentUser();
+        if (user) {
+          // Redirect based on role
+          if (user.role === 'admin' || user.role === 'junior_admin') {
+            window.location.href = 'admin.html';
+          } else {
+            window.location.href = 'cashier.html';
+          }
         }
+      } catch (err) {
+        console.log('Sem sessão ativa');
       }
     }
 
@@ -146,9 +152,9 @@
         const password = document.getElementById('reg-password').value;
         const role = document.getElementById('reg-role').value;
 
-        validateRequired(name, 'Nome');
-        validateRequired(email, 'Email');
-        validateRequired(password, 'Senha');
+        if (!name) throw new Error('Nome é obrigatório');
+        if (!email) throw new Error('Email é obrigatório');
+        if (!password || password.length < 6) throw new Error('Senha deve ter no mínimo 6 caracteres');
 
         // Register with Supabase Auth
         const { data: authData, error: authError } = await getSupabase().auth.signUp({
@@ -177,3 +183,4 @@
   </script>
 </body>
 </html>
+u
