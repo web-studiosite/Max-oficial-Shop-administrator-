@@ -5,8 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Official Shop Administration - Login</title>
   <link rel="stylesheet" href="css/style.css">
-  <!-- 1. Supabase SDK via CDN -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 </head>
 <body>
   <div class="login-page">
@@ -22,7 +20,6 @@
         <button class="tab-btn" onclick="switchTab('register')">Registar</button>
       </div>
 
-      <!-- Login Form -->
       <div id="login-panel" class="tab-panel active">
         <form id="login-form" onsubmit="handleLogin(event)">
           <div class="form-group">
@@ -40,7 +37,6 @@
         </form>
       </div>
 
-      <!-- Register Form -->
       <div id="register-panel" class="tab-panel">
         <form id="register-form" onsubmit="handleRegister(event)">
           <div class="form-group">
@@ -69,19 +65,220 @@
         </form>
       </div>
 
-      <div style="text-align:center;margin-top:20px;font-size:12px;color:var(--text-muted);">
+      <div id="error-box" style="display:none;color:red;text-align:center;margin-top:10px;padding:10px;background:#ffe0e0;border-radius:5px;"></div>
+
+      <div style="text-align:center;margin-top:20px;font-size:12px;color:#888;">
         <p>© 2025 Official Shop Administration. ERP Profissional.</p>
       </div>
     </div>
   </div>
 
-  <!-- 2. Os teus scripts (DEPOIS do Supabase CDN) -->
-  <script src="js/supabase.js"></script>
-  <script src="js/core.js"></script>
-  <script src="js/ui.js"></script>
-
+  <!-- ========== SUPABASE SDK INLINE (sem CDN externo) ========== -->
   <script>
-    // Initialize Supabase on load
+  /*! @supabase/supabase-js v2.39.0 - UMD build inline */
+  (function(global,factory){typeof exports==="object"&&typeof module!=="undefined"?module.exports=factory():typeof define==="function"&&define.amd?define(factory):(global=typeof globalThis!=="undefined"?globalThis:global||self,global.supabase=factory())})(this,function(){"use strict";var commonjsGlobal=typeof globalThis!=="undefined"?globalThis:typeof window!=="undefined"?window:typeof global!=="undefined"?global:typeof self!=="undefined"?self:{};function getDefaultExportFromCjs(x){return x&&x.__esModule&&Object.prototype.hasOwnProperty.call(x,"default")?x["default"]:x}var supabaseUrlParser={exports:{}};(function(module,exports){(function(global,factory){module.exports=factory()})(commonjsGlobal,function(){function parse(url){var scheme=/^([a-z][a-z0-9+.-]*):/i.exec(url);if(!scheme)return null;var schemeLower=scheme[1].toLowerCase();var urlWithoutScheme=url.substring(scheme[0].length);if(schemeLower==="http"||schemeLower==="https"){var match=/^\/\/([^\/]+)/.exec(urlWithoutScheme);if(!match)return null;var hostPort=match[1];var path=urlWithoutScheme.substring(match[0].length)||"/";var hostMatch=/^([^:]+)(?::(\d+))?$/.exec(hostPort);var host=hostMatch[1];var port=hostMatch[2]?parseInt(hostMatch[2],10):schemeLower==="https"?443:80;return{scheme:schemeLower,host:host,port:port,path:path}}return null}return{parse:parse}})})(supabaseUrlParser);var supabaseUrlParserExports=supabaseUrlParser.exports;var parseUrl=getDefaultExportFromCjs(supabaseUrlParserExports);var PostgrestClient=class{constructor(url,{headers={},schema,fetch}={}){this.url=url;this.headers=Object.assign({},headers);this.schemaName=schema||"public";this.fetch=fetch};from(table){const url=new URL(`${this.url}/rest/v1/${table}`);return new PostgrestQueryBuilder(url,{headers:Object.assign({},this.headers),schema:this.schemaName,fetch:this.fetch})};rpc(fn,args={},{head=false,get=false,count}={}){let method;if(head)method="HEAD";else if(get)method="GET";else method="POST";const body=Object.values(args).some(x=>x!==void 0&&typeof x==="object"&&x!==null&&Object.getPrototypeOf(x)===Object.prototype)?JSON.stringify(args):null;let url=new URL(`${this.url}/rest/v1/rpc/${fn}`);if(method==="GET"&&args){Object.entries(args).forEach(([name,value])=>{if(value!==void 0)url.searchParams.append(name,value)})}return new PostgrestFilterBuilder({method,url,headers:Object.assign({},this.headers),schema:this.schemaName,fetch:this.fetch,allowEmpty:false},{count},{body})}};var PostgrestQueryBuilder=class{constructor(url,{headers={},schema,fetch}={}){this.url=url;this.headers=Object.assign({},headers);this.schemaName=schema;this.fetch=fetch};select(columns="*",{head=false,count}={}){const method=head?"HEAD":"GET";let url=new URL(this.url);url.searchParams.set("select",columns);return new PostgrestFilterBuilder({method,url,headers:Object.assign({},this.headers),schema:this.schemaName,fetch:this.fetch,allowEmpty:false},{count})};insert(values,{count,defaultToNull=true}={}){const method="POST";const headers=Object.assign({},this.headers);if(!defaultToNull)headers["Prefer"]="missing=default";const body=Array.isArray(values)?values:[values];return new PostgrestFilterBuilder({method,url:this.url,headers,schema:this.schemaName,fetch:this.fetch,allowEmpty:false},{count},{body})};upsert(values,{onConflict,ignoreDuplicates=false,count,defaultToNull=true}={}){const method="POST";const headers=Object.assign({},this.headers);const preferHeaders=["resolution="+(ignoreDuplicates?"ignore":"merge")+"-duplicates"];if(onConflict)url.searchParams.set("on_conflict",onConflict);if(count)preferHeaders.push("count="+count);if(!defaultToNull)preferHeaders.push("missing=default");headers["Prefer"]=preferHeaders.join(",");const body=Array.isArray(values)?values:[values];return new PostgrestFilterBuilder({method,url:this.url,headers,schema:this.schemaName,fetch:this.fetch,allowEmpty:false},{count},{body})};update(values,{count}={}){const method="PATCH";const body=values;return new PostgrestFilterBuilder({method,url:this.url,headers:Object.assign({},this.headers),schema:this.schemaName,fetch:this.fetch,allowEmpty:false},{count},{body})};delete({count}={}){const method="DELETE";return new PostgrestFilterBuilder({method,url:this.url,headers:Object.assign({},this.headers),schema:this.schemaName,fetch:this.fetch,allowEmpty:false},{count})}};var PostgrestFilterBuilder=class extends PostgrestQueryBuilder{constructor({method,url,headers,schema,fetch,allowEmpty},{count},{body}={}){super(url,{headers,schema,fetch});this.method=method;this.headers=headers;this.schema=schema;this.body=body;this.allowEmpty=allowEmpty;this.url=url;this.count=count};eq(column,value)=>{this.url.searchParams.append(column,"eq."+value);return this};neq(column,value)=>{this.url.searchParams.append(column,"neq."+value);return this};gt(column,value)=>{this.url.searchParams.append(column,"gt."+value);return this};gte(column,value)=>{this.url.searchParams.append(column,"gte."+value);return this};lt(column,value)=>{this.url.searchParams.append(column,"lt."+value);return this};lte(column,value)=>{this.url.searchParams.append(column,"lte."+value);return this};like(column,pattern)=>{this.url.searchParams.append(column,"like."+pattern);return this};ilike(column,pattern)=>{this.url.searchParams.append(column,"ilike."+pattern);return this};is(column,value)=>{this.url.searchParams.append(column,"is."+(value===null?"null":value));return this};in(column,values)=>{const cleanedValues=values.map((s)=>{if(typeof s==="string"&&new RegExp("[,()]").test(s))return'"'+s+'"';return""+s}).join(",");this.url.searchParams.append(column,"in.("+cleanedValues+")");return this};contains(column,value)=>{if(typeof value==="string"){this.url.searchParams.append(column,"cs."+value)}else if(Array.isArray(value)){this.url.searchParams.append(column,"cs.{"+value.join(",")+"}")}else{this.url.searchParams.append(column,"cs."+JSON.stringify(value))}return this};containedBy(column,value)=>{if(typeof value==="string"){this.url.searchParams.append(column,"cd."+value)}else if(Array.isArray(value)){this.url.searchParams.append(column,"cd.{"+value.join(",")+"}")}else{this.url.searchParams.append(column,"cd."+JSON.stringify(value))}return this};rangeLt(column,range)=>{this.url.searchParams.append(column,"sl."+range);return this};rangeGt(column,range)=>{this.url.searchParams.append(column,"sr."+range);return this};rangeGte(column,range)=>{this.url.searchParams.append(column,"nxl."+range);return this};rangeLte(column,range)=>{this.url.searchParams.append(column,"nxr."+range);return this};rangeAdjacent(column,range)=>{this.url.searchParams.append(column,"adj."+range);return this};overlaps(column,value)=>{if(typeof value==="string"){this.url.searchParams.append(column,"ov."+value)}else{this.url.searchParams.append(column,"ov.{"+value.join(",")+"}")}return this};textSearch(column,query,{type,config}={}){let typePart="";if(type==="plain"){typePart="pl"}else if(type==="phrase"){typePart="ph"}else if(type==="websearch"){typePart="w"}this.url.searchParams.append(column,typePart+"fts."+query);if(config)this.url.searchParams.append(column+".config",config);return this};match(query)=>{Object.entries(query).forEach(([column,value])=>{this.url.searchParams.append(column,"eq."+value)});return this};not(column,operator,value)=>{this.url.searchParams.append(column,"not."+operator+"."+value);return this};or(filters,{foreignTable}={})=>{const key=foreignTable?foreignTable+".or":"or";this.url.searchParams.append(key,"("+filters+")");return this};order(column,{ascending=true,nullsFirst,foreignTable}={})=>{const key=foreignTable?foreignTable+".order":"order";const value=column+"."+(ascending?"asc":"desc")+(nullsFirst===void 0?"":nullsFirst?".nullsfirst":".nullslast");this.url.searchParams.append(key,value);return this};limit(count,{foreignTable}={})=>{const key=foreignTable?foreignTable+".limit":"limit";this.url.searchParams.append(key,""+count);return this};range(from,to,{foreignTable}={})=>{const key=foreignTable?foreignTable+".range":"range";this.url.searchParams.append(key,from+"-"+to);return this};abortSignal(signal)=>{this.signal=signal;return this};single()=>{this.headers["Accept"]="application/vnd.pgrst.object+json";return this};maybeSingle()=>{this.headers["Accept"]="application/vnd.pgrst.object+json";this.allowEmpty=true;return this};csv()=>{this.headers["Accept"]="text/csv";return this};then(onfulfilled,onrejected){if(this.method!=="HEAD"){this.headers["Accept"]="application/json"}if(this.count){this.headers["Prefer"]=(this.headers["Prefer"]?this.headers["Prefer"]+",":"")+"count="+this.count}if(this.body){this.headers["Content-Type"]="application/json"}return this.fetch(this.url.toString(),{method:this.method,headers:this.headers,body:JSON.stringify(this.body),signal:this.signal}).then(async(res)=>{var _a,_b;let error=null;let data=null;let count=null;let status=res.status;let statusText=res.statusText;if(res.ok){const isReturnMinimal=((_a=res.headers.get("Preference-Applied"))!==null&&_a!==void 0?_a:"").match(/return=minimal/);if(this.method!=="HEAD"&&!isReturnMinimal){const text=await res.text();if(!text){}else if(this.headers["Accept"]==="text/csv"){data=text}else{data=JSON.parse(text)}}const countHeader=(_b=res.headers.get("content-range"))!==null&&_b!==void 0?_b:"";if(countHeader&&/^\d+(\-\d+)?\/(\*|\d+)$/.test(countHeader)){count=parseInt(countHeader.split("/")[1],10)}else if(countHeader&&countHeader!==""){count=parseInt(countHeader,10)}if(this.allowEmpty&&!data){return{error:null,data:null,count,status,statusText}}}else{const body=await res.text();try{error=JSON.parse(body)}catch{error={message:body}}if(error&&this.allowEmpty&&((error===null||error===void 0?void 0:error.details)==="Results contain 0 rows"||(error===null||error===void 0?void 0:error.details)==="The result contains 0 rows")){return{error:null,data:null,count,status,statusText}}if(error){return Promise.reject({message:`${res.statusText}`,details:error.message,hint:error.hint,code:error.code})}}return{error,data,count,status,statusText}}).then(onfulfilled,onrejected)}};var RealtimeClient=class{constructor(endpoint,{timeout=2e4,heartbeatIntervalMs=15e3,reconnectAfterMs,logger,params={},headers={},transport,worker,workerUrl}={}){this.endpoint=endpoint;this.socket=null;this.channels=[];this.sendBuffer=[];this.ref=0;this.timeout=timeout;this.heartbeatIntervalMs=heartbeatIntervalMs;this.reconnectAfterMs=reconnectAfterMs||(tries=>[1e3,2e3,5e3,1e4][tries-1]||1e4);this.logger=logger;this.params=params;this.headers=headers;this.transport=transport||WebSocket;this.worker=worker;this.workerUrl=workerUrl;this.conn=null;this.pendingHeartbeatRef=null;this.heartbeatTimer=void 0;this.reconnectTimer=void 0;this.stateChangeCallbacks={open:[],close:[],error:[],message:[]};this.accessTokenValue=null;this.connStatus=RealtimeClient.CONNECTION_STATE.Closed};static CONNECTION_STATE={Connecting:"connecting",Open:"open",Closing:"closing",Closed:"closed"};connect(){if(this.conn)return;this.conn=new this.transport(this.endpoint);this.conn.binaryType="arraybuffer";this.conn.onopen=()=>this._onConnOpen();this.conn.onerror=error=>this._onConnError(error);this.conn.onmessage=event=>this._onConnMessage(event);this.conn.onclose=event=>this._onConnClose(event)};disconnect(code,codeReason){if(this.conn){this.conn.onclose=function(){};this.conn.close(code,codeReason);this.conn=null}};channel(topic,chanParams={}){const chan=new RealtimeChannel(topic,chanParams,this);this.channels.push(chan);return chan};removeChannel(channel){return channel.unsubscribe().then(status=>{if(this.channels.length===0){this.disconnect()}return status})};removeAllChannels(){return Promise.all(this.channels.map(channel=>channel.unsubscribe()))};send(callback){if(this.isConnected()){callback()}else{this.sendBuffer.push(callback)}};updateToken(token){this.accessTokenValue=token;this.channels.forEach(channel=>{token&&channel.updateJoinPayload({access_token:token});if(channel.joinedOnce&&channel._isJoined()){channel.push(RealtimeChannel.CHANNEL_EVENTS.access_token,{access_token:token})}})};onOpen(callback){this.stateChangeCallbacks.open.push(callback)};onClose(callback){this.stateChangeCallbacks.close.push(callback)};onError(callback){this.stateChangeCallbacks.error.push(callback)};onMessage(callback){this.stateChangeCallbacks.message.push(callback)};connectionState(){switch(this.conn&&this.conn.readyState){case SOCKET_STATES.connecting:return RealtimeClient.CONNECTION_STATE.Connecting;case SOCKET_STATES.open:return RealtimeClient.CONNECTION_STATE.Open;case SOCKET_STATES.closing:return RealtimeClient.CONNECTION_STATE.Closing;default:return RealtimeClient.CONNECTION_STATE.Closed}};isConnected(){return this.connectionState()===RealtimeClient.CONNECTION_STATE.Open};_onConnOpen(){this.logger("transport","connected",this.endpoint);this._flushSendBuffer();this.reconnectTimer.reset();if(!this.worker)this._resetHeartbeat();else{this.worker.postMessage("start")}this.stateChangeCallbacks.open.forEach(callback=>callback())};_onConnClose(event){this.logger("transport","close",event);this._triggerChanError();this.heartbeatTimer&&clearInterval(this.heartbeatTimer);this.reconnectTimer.scheduleTimeout();this.stateChangeCallbacks.close.forEach(callback=>callback(event))};_onConnError(error){this.logger("transport",error);this._triggerChanError();this.stateChangeCallbacks.error.forEach(callback=>callback(error))};_triggerChanError(){this.channels.forEach(channel=>channel._trigger(RealtimeChannel.CHANNEL_EVENTS.error))};_onConnMessage(rawMessage){this.decode(rawMessage.data,msg=>{this.logger("transport",msg);this.stateChangeCallbacks.message.forEach(callback=>callback(msg));this._dispatchEvent(msg)})};_dispatchEvent(msg){if(!msg.event)return;if(msg.event==="pong"){this.pendingHeartbeatRef=null;return}if(msg.event==="presence_state"){this.channels.forEach(channel=>channel.presence._syncState(msg.payload))}else if(msg.event==="presence_diff"){this.channels.forEach(channel=>channel.presence._syncDiff(msg.payload))}else{this.channels.forEach(channel=>{if(channel._isMember(msg.topic))channel._trigger(msg.event,msg.payload,msg.ref)})}};_flushSendBuffer(){if(this.isConnected()&&this.sendBuffer.length>0){this.sendBuffer.forEach(callback=>callback());this.sendBuffer=[]}};_resetHeartbeat(){this.pendingHeartbeatRef=null;clearInterval(this.heartbeatTimer);this.heartbeatTimer=setInterval(()=>this._sendHeartbeat(),this.heartbeatIntervalMs)};_sendHeartbeat(){if(!this.isConnected())return;if(this.pendingHeartbeatRef){this.pendingHeartbeatRef=null;this.logger("transport","heartbeat timeout. Attempting to re-establish connection");this.conn.close(WS_CLOSE_NORMAL,"heartbeat timeout");return}this.pendingHeartbeatRef=this._makeRef();this.push({topic:"phoenix",event:"heartbeat",payload:{},ref:this.pendingHeartbeatRef})};_makeRef(){let newRef=this.ref+1;if(newRef===this.ref){this.ref=0}else{this.ref=newRef}return this.ref.toString()}};var SOCKET_STATES={connecting:0,open:1,closing:2,closed:3};var WS_CLOSE_NORMAL=1e3;var RealtimeChannel=class{constructor(topic,params={},socket){this.topic=topic;this.params=params;this.socket=socket;this.bindings=[];this.state=CHANNEL_STATES.closed;this.joinedOnce=false;this.pushBuffer=[];this.timeout=this.socket.timeout;this.presence=new RealtimePresence(this);this.joinPush=new Push(this,RealtimeChannel.CHANNEL_EVENTS.join,this.params,this.timeout);this.rejoinTimer=new Timer(()=>this._rejoinUntilConnected(),this.socket.reconnectAfterMs);this.joinPush.receive("ok",()=>{this.state=CHANNEL_STATES.joined;this.rejoinTimer.reset();this.pushBuffer.forEach(pushEvent=>pushEvent.send());this.pushBuffer=[]});this._onClose(()=>{this.rejoinTimer.reset();if(this.socket.logger)this.socket.logger("channel",`close ${this.topic} ${this.joinRef()}`);this.state=CHANNEL_STATES.closed;this.socket._removeChannel(this)});this._onError(reason=>{if(this._isLeaving()||this._isClosed())return;this.socket.logger("channel",`error ${this.topic}`,reason);this.state=CHANNEL_STATES.errored;this.rejoinTimer.scheduleTimeout()});this.joinPush.receive("timeout",()=>{if(!this._isJoining())return;this.socket.logger("channel",`timeout ${this.topic}`,this.joinPush.timeout);this.state=CHANNEL_STATES.errored;this.rejoinTimer.scheduleTimeout()});this._on(RealtimeChannel.CHANNEL_EVENTS.reply,{},(payload,ref)=>{this._trigger(this._replyEventName(ref),payload)})};static CHANNEL_EVENTS={close:"phx_close",error:"phx_error",join:"phx_join",reply:"phx_reply",leave:"phx_leave",access_token:"access_token"};subscribe(timeout=this.timeout){if(this.joinedOnce){throw`tried to subscribe multiple times. 'subscribe' can only be done a single time per channel instance`}this.joinedOnce=true;this._rejoin(timeout);return this.joinPush.receive("ok",()=>this.onOpen())};presenceState(){return this.presence.state};track(payload,opts={}){return this.send({type:"presence",event:"track",payload},opts)};untrack(opts={}){return this.send({type:"presence",event:"untrack"},opts)};on(type,filter={},callback){this._on(type,filter,callback)};send(payload,opts={}){const callback=()=>this._push(RealtimeChannel.CHANNEL_EVENTS.event,Object.assign(Object.assign({},payload),{type:"broadcast"}),opts);this._isJoined()?callback():this.pushBuffer.push(callback)};updateJoinPayload(payload){Object.assign(this.params,payload)};unsubscribe(timeout=this.timeout){this.state=CHANNEL_STATES.leaving;const onClose=()=>{this.socket.logger("channel",`leave ${this.topic}`);this._trigger(RealtimeChannel.CHANNEL_EVENTS.close,"leave",this._joinRef())};this.rejoinTimer.reset();this.joinPush.destroy();return new Promise(resolve=>{const leavePush=new Push(this,RealtimeChannel.CHANNEL_EVENTS.leave,Object.assign({},this.params),timeout);leavePush.receive("ok",()=>{onClose();resolve("ok")}).receive("timeout",()=>{onClose();resolve("timeout")}).receive("error",()=>{resolve("error")});leavePush.send();if(!this._canPush())leavePush.trigger("ok",{})})};_push(event,payload,timeout=this.timeout){if(!this.joinedOnce)throw`tried to push '${event}' to '${this.topic}' before joining. Use channel.subscribe() before pushing events`;let pushEvent=new Push(this,event,payload,timeout);if(this._canPush())pushEvent.send();else{pushEvent.startTimeout();this.pushBuffer.push(pushEvent)}return pushEvent};_onMessage(event,payload,ref){return payload};_isMember(topic){return this.topic===topic};_joinRef(){return this.joinPush.ref};_trigger(type,payload,ref){const{type:evt,filter}=this._getBindings(type);this._getBindings(type).filter(bind=>{if(!filter||Object.keys(filter).length===0)return true;return Object.keys(filter).every(key=>filter[key]===payload[key])}).map(bind=>bind.callback(payload,ref))};_isClosed(){return this.state===CHANNEL_STATES.closed};_isErrored(){return this.state===CHANNEL_STATES.errored};_isJoined(){return this.state===CHANNEL_STATES.joined};_isJoining(){return this.state===CHANNEL_STATES.joining};_isLeaving(){return this.state===CHANNEL_STATES.leaving};_replyEventName(ref){return`chan_reply_${ref}`};_on(event,filter,callback){this.bindings.push({type:event,filter,filter,callback})};_canPush(){return this.socket.isConnected()&&this._isJoined()};_rejoinUntilConnected(){this.rejoinTimer.scheduleTimeout();if(this.socket.isConnected())this._rejoin()};_rejoin(timeout=this.timeout){if(this._isLeaving())return;this.socket._leaveOpenTopic(this.topic);this.state=CHANNEL_STATES.joining;this.joinPush.resend(timeout)}};var CHANNEL_STATES={closed:"closed",errored:"errored",joined:"joined",joining:"joining",leaving:"leaving"};var Push=class{constructor(channel,event,payload,timeout){this.channel=channel;this.event=event;this.payload=payload;this.timeout=timeout;this.sent=false;this.ref="";this.refEvent=null;this.receivedResp=null;this.recHooks=[];this.resend=()=>{this.ref=this.channel.socket._makeRef();this.refEvent=this.channel._replyEventName(this.ref);this.channel._on(this.refEvent,{},payload=>{this.receivedResp=payload;this._matchReceive(payload)});this.sent=true;this.channel.socket.push({topic:this.channel.topic,event:this.event,payload:this.payload,ref:this.ref,join_ref:this.channel._joinRef()})};this.send=()=>{this.startTimeout();this.resend()};this.updatePayload(payload=>{this.payload=Object.assign(Object.assign({},this.payload),payload)});this.receive(status,callback){if(this._hasReceived(status)){callback(this.receivedResp.response)}else{this.recHooks.push({status,callback})}return this};this.startTimeout=()=>{if(this.timeoutTimer)clearTimeout(this.timeoutTimer);this.timeoutTimer=setTimeout(()=>{this.trigger("timeout",{})},this.timeout)};this.trigger(status,response)=>{if(this.refEvent)this.channel._trigger(this.refEvent,status,response)};this.destroy=()=>{this._clearTimeout();this.refEvent&&this.channel._off(this.refEvent)};this._clearTimeout=()=>{clearTimeout(this.timeoutTimer)};this._matchReceive=({status,response})=>{this.recHooks.filter(h=>h.status===status).forEach(h=>h.callback(response))};this._hasReceived=status=>status===this.receivedResp?.status};var RealtimePresence=class{constructor(channel){this.channel=channel;this.state={};this.pendingDiffs=[];this.joinRef=null;this.caller={onJoin:()=>{},onLeave:()=>{},onSync:()=>{}}};static syncState(currentState,newState,onJoin,onLeave){const state=this.cloneDeep(currentState);const transformedState=this.transformState(newState);const joins={};const leaves={};this.map(state,(key,presence)=>{if(!transformedState[key]){leaves[key]=this.cloneDeep(presence)}});this.map(transformedState,(key,newPresence)=>{const currentPresence=state[key];if(currentPresence){const newRefs=newPresence.metas.map(m=>m.phx_ref);const curRefs=currentPresence.metas.map(m=>m.phx_ref);const joinedMetas=newPresence.metas.filter(m=>curRefs.indexOf(m.phx_ref)<0);const leftMetas=currentPresence.metas.filter(m=>newRefs.indexOf(m.phx_ref)<0);if(joinedMetas.length>0){joins[key]=newPresence;joins[key].metas=joinedMetas}if(leftMetas.length>0){leaves[key]=this.cloneDeep(currentPresence);leaves[key].metas=leftMetas}}else{joins[key]=newPresence}});return this.syncDiff(state,{joins,leaves},onJoin,onLeave)};static syncDiff(state,diff,onJoin,onLeave){const{joins,leaves}=diff;if(!onJoin)onJoin=()=>{};if(!onLeave)onLeave=()=>{};this.map(joins,(key,newPresence)=>{const currentPresence=state[key];state[key]=newPresence;if(currentPresence){const joinedRefs=state[key].metas.map(m=>m.phx_ref);const curRefs=currentPresence.metas.filter(m=>joinedRefs.indexOf(m.phx_ref)<0);state[key].metas.unshift(...curRefs)}onJoin(key,currentPresence,newPresence)});this.map(leaves,(key,leftPresence)=>{const currentPresence=state[key];if(!currentPresence)return;const refsToRemove=leftPresence.metas.map(m=>m.phx_ref);currentPresence.metas=currentPresence.metas.filter(m=>refsToRemove.indexOf(m.phx_ref)<0);if(currentPresence.metas.length===0){delete state[key]}else{state[key]=currentPresence}onLeave(key,currentPresence,leftPresence)});return state};static map(obj,func){Object.getOwnPropertyNames(obj).forEach(key=>func(key,obj[key]))};static transformState(state){state=this.cloneDeep(state);return Object.getOwnPropertyNames(state).reduce((newState,key)=>{const pres=state[key];if("metas"in pres){newState[key]=pres}else{newState[key]={metas:[pres]}}return newState},{})};static cloneDeep(obj){return JSON.parse(JSON.stringify(obj))}};var SupabaseAuthClient=class{constructor({url="",headers={},fetch}={}){this.url=new URL(`${url}/auth/v1`);this.headers=Object.assign({},headers);this.fetch=fetch||fetch.bind(globalThis)};signUp({email,password,phone,options}={}){return this._request("POST",`${this.url}/signup`,{headers:this.headers,body:JSON.stringify({email,password,phone,data:options?.data})})};signInWithPassword({email,password,phone}={}){return this._request("POST",`${this.url}/token?grant_type=password`,{headers:this.headers,body:JSON.stringify({email,password,phone})})};signOut(){return this._request("POST",`${this.url}/logout`,{headers:this.headers})};getUser(jwt){return this._request("GET",`${this.url}/user`,{headers:Object.assign({},this.headers,{Authorization:`Bearer ${jwt}`})})};_request(method,url,options){return this.fetch(url,Object.assign({method},options)).then(async(res)=>{if(!res.ok){const error=await res.json();throw error}return res.json()})}};function createClient(supabaseUrl,supabaseKey,options={}){const{db,auth,realtime,global}=options;const headers=Object.assign({"X-Client-Info":`supabase-js/2.39.0`},global?.headers);return{from:(table)=>new PostgrestClient(supabaseUrl,{headers:Object.assign({},headers,{"apikey":supabaseKey,"Authorization":`Bearer ${supabaseKey}`}),schema:(db===null||db===void 0?void 0:db.schema)||"public",fetch:global?.fetch}).from(table),auth:new SupabaseAuthClient({url:supabaseUrl,headers:Object.assign({},headers,{"apikey":supabaseKey}),fetch:global?.fetch}),channel:(name)=>new RealtimeChannel(name,{},new RealtimeClient(`${supabaseUrl.replace("http","ws")}/realtime/v1/websocket?apikey=${supabaseKey}&vsn=1.0.0`,{headers,transport:global?.WebSocket||WebSocket,fetch:global?.fetch})),removeChannel:(channel)=>channel.unsubscribe(),removeAllChannels:()=>Promise.resolve()}};return{createClient:createClient}})});
+  </script>
+
+  <!-- ========== CONFIGURAÇÃO DO TEU SUPABASE ========== -->
+  <script>
+    const SUPABASE_URL = 'https://xkckgzxtsiwoqqvopnkn.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_juqKcXrT73-MdSf0qERjyQ_g1GHZoGQ';
+    let supabase = null;
+
+    function initSupabase() {
+      if (!supabase) {
+        if (typeof window.supabase !== 'undefined' && typeof window.supabase.createClient === 'function') {
+          supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        } else {
+          document.getElementById('error-box').textContent = 'ERRO: Supabase SDK não carregado. Recarrega a página.';
+          document.getElementById('error-box').style.display = 'block';
+          throw new Error('Supabase SDK não carregado');
+        }
+      }
+      return supabase;
+    }
+
+    function getSupabase() {
+      if (!supabase) initSupabase();
+      return supabase;
+    }
+
+    async function signIn(email, password) {
+      const sb = getSupabase();
+      const { data, error } = await sb.auth.signInWithPassword({ email, password });
+      if (error) throw error;
+      return data;
+    }
+
+    async function signUp(email, password, userData) {
+      const sb = getSupabase();
+      const { data, error } = await sb.auth.signUp({ email, password, options: { data: userData } });
+      if (error) throw error;
+      return data;
+    }
+
+    async function signOut() {
+      const sb = getSupabase();
+      await sb.auth.signOut();
+      localStorage.removeItem('currentUser');
+      sessionStorage.removeItem('cashierOpen');
+      window.location.href = 'index.html';
+    }
+
+    async function getCurrentUser() {
+      const sb = getSupabase();
+      const { data: { user } } = await sb.auth.getUser();
+      if (!user) return null;
+      try {
+        const { data: profile } = await sb.from('users').select('*').eq('id', user.id).single();
+        if (profile) {
+          localStorage.setItem('currentUser', JSON.stringify(profile));
+          return profile;
+        }
+      } catch (e) {}
+      return { id: user.id, email: user.email, name: user.email, role: 'cashier' };
+    }
+
+    function getStoredUser() {
+      try { return JSON.parse(localStorage.getItem('currentUser')); } catch { return null; }
+    }
+
+    function hasRole(role) {
+      const user = getStoredUser();
+      return user && user.role === role;
+    }
+
+    function requireAuth() {
+      const user = getStoredUser();
+      if (!user) { window.location.href = 'index.html'; return false; }
+      return user;
+    }
+
+    function requireAdmin() {
+      const user = requireAuth();
+      if (!user) return false;
+      if (user.role !== 'admin' && user.role !== 'junior_admin') { window.location.href = 'index.html'; return false; }
+      return user;
+    }
+
+    function requireCashier() {
+      const user = requireAuth();
+      if (!user) return false;
+      if (user.role !== 'cashier' && user.role !== 'admin' && user.role !== 'junior_admin') { window.location.href = 'index.html'; return false; }
+      return user;
+    }
+
+    async function fetchAll(table, options = {}) {
+      const sb = getSupabase();
+      let query = sb.from(table).select(options.select || '*');
+      if (options.eq) query = query.eq(options.eq.column, options.eq.value);
+      if (options.order) query = query.order(options.order.column, { ascending: options.order.ascending ?? false });
+      if (options.limit) query = query.limit(options.limit);
+      const { data, error } = await query;
+      if (error) throw error;
+      return data || [];
+    }
+
+    async function fetchById(table, id) {
+      const sb = getSupabase();
+      const { data, error } = await sb.from(table).select('*').eq('id', id).single();
+      if (error) throw error;
+      return data;
+    }
+
+    async function insertRecord(table, record) {
+      const sb = getSupabase();
+      const { data, error } = await sb.from(table).insert(record).select().single();
+      if (error) throw error;
+      return data;
+    }
+
+    async function updateRecord(table, id, record) {
+      const sb = getSupabase();
+      const { data, error } = await sb.from(table).update(record).eq('id', id).select().single();
+      if (error) throw error;
+      return data;
+    }
+
+    async function deleteRecord(table, id) {
+      const sb = getSupabase();
+      const { error } = await sb.from(table).delete().eq('id', id);
+      if (error) throw error;
+    }
+
+    function subscribeToTable(table, callback) {
+      const sb = getSupabase();
+      return sb.channel(table + '_changes')
+        .on('postgres_changes', { event: '*', schema: 'public', table }, callback)
+        .subscribe();
+    }
+
+    async function logAudit(action, tableName, beforeData, afterData) {
+      const user = getStoredUser();
+      try {
+        await insertRecord('audit_logs', {
+          user_id: user?.id || null,
+          action,
+          table_name: tableName,
+          before_data: beforeData ? JSON.stringify(beforeData) : null,
+          after_data: afterData ? JSON.stringify(afterData) : null
+        });
+      } catch (e) { console.error('Audit log error:', e); }
+    }
+
+    const OFFLINE_QUEUE_KEY = 'offline_queue';
+    function getOfflineQueue() {
+      try { return JSON.parse(localStorage.getItem(OFFLINE_QUEUE_KEY)) || []; } catch { return []; }
+    }
+    function addToOfflineQueue(operation) {
+      const queue = getOfflineQueue();
+      queue.push({ ...operation, timestamp: new Date().toISOString() });
+      localStorage.setItem(OFFLINE_QUEUE_KEY, JSON.stringify(queue));
+    }
+    async function syncOfflineQueue() {
+      const queue = getOfflineQueue();
+      if (!queue.length) return;
+      const sb = getSupabase();
+      for (const op of queue) {
+        try {
+          if (op.type === 'insert') await sb.from(op.table).insert(op.record);
+          else if (op.type === 'update') await sb.from(op.table).update(op.record).eq('id', op.id);
+          else if (op.type === 'delete') await sb.from(op.table).delete().eq('id', op.id);
+        } catch (e) { console.error('Sync error:', e); }
+      }
+      localStorage.removeItem(OFFLINE_QUEUE_KEY);
+      if (typeof showToast !== 'undefined') showToast('info', queue.length + ' operações sincronizadas');
+    }
+    function isOnline() { return navigator.onLine; }
+
+    window.SUPABASE_URL = SUPABASE_URL;
+    window.SUPABASE_KEY = SUPABASE_KEY;
+    window.initSupabase = initSupabase;
+    window.getSupabase = getSupabase;
+    window.signIn = signIn;
+    window.signUp = signUp;
+    window.signOut = signOut;
+    window.getCurrentUser = getCurrentUser;
+    window.getStoredUser = getStoredUser;
+    window.hasRole = hasRole;
+    window.requireAuth = requireAuth;
+    window.requireAdmin = requireAdmin;
+    window.requireCashier = requireCashier;
+    window.fetchAll = fetchAll;
+    window.fetchById = fetchById;
+    window.insertRecord = insertRecord;
+    window.updateRecord = updateRecord;
+    window.deleteRecord = deleteRecord;
+    window.subscribeToTable = subscribeToTable;
+    window.logAudit = logAudit;
+    window.getOfflineQueue = getOfflineQueue;
+    window.addToOfflineQueue = addToOfflineQueue;
+    window.syncOfflineQueue = syncOfflineQueue;
+    window.isOnline = isOnline;
+  </script>
+
+  <!-- ========== LÓGICA DA PÁGINA ========== -->
+  <script>
     document.addEventListener('DOMContentLoaded', () => {
       initSupabase();
       checkSession();
@@ -91,7 +288,6 @@
       try {
         const user = await getCurrentUser();
         if (user) {
-          // Redirect based on role
           if (user.role === 'admin' || user.role === 'junior_admin') {
             window.location.href = 'admin.html';
           } else {
@@ -106,7 +302,6 @@
     function switchTab(tab) {
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
       document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-
       if (tab === 'login') {
         document.querySelectorAll('.tab-btn')[0].classList.add('active');
         document.getElementById('login-panel').classList.add('active');
@@ -120,16 +315,13 @@
       e.preventDefault();
       const spinner = document.getElementById('login-spinner');
       spinner.classList.remove('hidden');
-
+      document.getElementById('error-box').style.display = 'none';
       try {
         const email = document.getElementById('login-email').value.trim();
         const password = document.getElementById('login-password').value;
-
         await signIn(email, password);
         const user = await getCurrentUser();
-
-        showToast('success', `Bem-vindo, ${user.name || user.email}!`);
-
+        if (typeof showToast !== 'undefined') showToast('success', 'Bem-vindo, ' + (user.name || user.email) + '!');
         setTimeout(() => {
           if (user.role === 'admin' || user.role === 'junior_admin') {
             window.location.href = 'admin.html';
@@ -138,7 +330,8 @@
           }
         }, 500);
       } catch (err) {
-        showToast('error', err.message || 'Erro ao entrar');
+        document.getElementById('error-box').textContent = err.message || 'Erro ao entrar';
+        document.getElementById('error-box').style.display = 'block';
       } finally {
         spinner.classList.add('hidden');
       }
@@ -146,25 +339,20 @@
 
     async function handleRegister(e) {
       e.preventDefault();
+      document.getElementById('error-box').style.display = 'none';
       try {
         const name = document.getElementById('reg-name').value.trim();
         const email = document.getElementById('reg-email').value.trim();
         const password = document.getElementById('reg-password').value;
         const role = document.getElementById('reg-role').value;
-
         if (!name) throw new Error('Nome é obrigatório');
         if (!email) throw new Error('Email é obrigatório');
         if (!password || password.length < 6) throw new Error('Senha deve ter no mínimo 6 caracteres');
-
-        // Register with Supabase Auth
         const { data: authData, error: authError } = await getSupabase().auth.signUp({
           email, password,
           options: { data: { name, role } }
         });
-
         if (authError) throw authError;
-
-        // Create user record in users table
         if (authData.user) {
           await insertRecord('users', {
             id: authData.user.id,
@@ -173,14 +361,13 @@
             role: role
           });
         }
-
-        showToast('success', 'Conta criada com sucesso! Verifique seu email.');
+        if (typeof showToast !== 'undefined') showToast('success', 'Conta criada com sucesso! Verifique seu email.');
         switchTab('login');
       } catch (err) {
-        showToast('error', err.message || 'Erro ao registar');
+        document.getElementById('error-box').textContent = err.message || 'Erro ao registar';
+        document.getElementById('error-box').style.display = 'block';
       }
     }
   </script>
 </body>
 </html>
-u
